@@ -29,4 +29,6 @@ class Configuration : Stage
     void Update();
     void Render();
 
+		ALLEGRO_FONT* configFont;
+
 };

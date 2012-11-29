@@ -10,7 +10,9 @@ int main( int argc, char* argv[] )
 	{
 		return -1;
 	}
-	if( !al_install_keyboard() || !al_install_joystick() || !al_init_primitives_addon() )
+	
+	al_init_font_addon();
+	if( !al_install_keyboard() || !al_install_joystick() || !al_init_primitives_addon() || !al_init_ttf_addon() )
 	{
 		return -1;
 	}
@@ -77,7 +79,9 @@ int main( int argc, char* argv[] )
 						break;
 				}
 			}
+			al_clear_to_color( al_map_rgb( 0, 0, 0 ) );
 			GameStack->Current()->Render();
+			al_flip_display();
 		}
 	}
 
