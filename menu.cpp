@@ -1,6 +1,7 @@
 
 #include "menu.h"
 #include "configure.h"
+#include "player.h"
 
 void Menu::Begin()
 {
@@ -17,6 +18,12 @@ void Menu::Begin()
 	titleBkg = al_load_bitmap( "resource/title.png" );
 	buttonUp = al_load_bitmap( "resource/button_up.png" );
 	buttonDown = al_load_bitmap( "resource/button_down.png" );
+
+
+	// Debug!!
+	Player* p = new Player();
+	PlayerList->AddToEnd((void*)p);
+
 }
 
 void Menu::Pause()
@@ -89,6 +96,8 @@ void Menu::Render()
 	char numJoy[200];
 	sprintf( numJoy, "%d Joystick(s) Found", al_get_num_joysticks() );
 	al_draw_text( menuFont, al_map_rgb( 0, 0, 0 ), CurrentConfiguration->ScreenWidth, CurrentConfiguration->ScreenHeight - 48, ALLEGRO_ALIGN_RIGHT, numJoy );
+
+
 }
 
 void Menu::RenderPlayerBox( int PlayerIdx, int BoxX, int BoxY, int BoxW, int BoxH )
@@ -101,6 +110,8 @@ void Menu::RenderPlayerBox( int PlayerIdx, int BoxX, int BoxY, int BoxW, int Box
 	{
 		al_draw_bitmap( (buttonState == 0 ? buttonUp : buttonDown), BoxX + (BoxW / 2) - (al_get_bitmap_width(buttonDown) / 2), BoxY + (BoxH / 2) - (al_get_bitmap_height(buttonDown) / 2), 0 );
 	} else {
+		int ScaleSize = ((BoxW <= BoxH ? BoxW : BoxH) / 5) * 4;
+		((Player*)PlayerList->ItemAt( PlayerIdx ))->Render( BoxX + (BoxW / 2), BoxY + (BoxH / 2) + (ScaleSize / 2), ScaleSize, ScaleSize );
 	}
 
 }

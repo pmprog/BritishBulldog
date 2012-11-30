@@ -30,12 +30,21 @@ StageStack*						GameStack;
 Configuration*				CurrentConfiguration;
 List*									PlayerList;
 
+ALLEGRO_BITMAP*				SkinBase;
+ALLEGRO_BITMAP*				SkinHair;
+ALLEGRO_BITMAP*				SkinTeam;
+ALLEGRO_BITMAP*				SkinSkin;
+
 #else
 
-extern bool						Quit;
-extern StageStack*		GameStack;
-extern Configuration*	CurrentConfiguration;
-extern List*					PlayerList;
+extern bool							Quit;
+extern StageStack*			GameStack;
+extern Configuration*		CurrentConfiguration;
+extern List*						PlayerList;
+extern ALLEGRO_BITMAP*	SkinBase;
+extern ALLEGRO_BITMAP*	SkinHair;
+extern ALLEGRO_BITMAP*	SkinTeam;
+extern ALLEGRO_BITMAP*	SkinSkin;
 
 #endif
 

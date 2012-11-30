@@ -5,14 +5,11 @@
 
 void BootUp::Begin()
 {
-	/*
-	if( !CurrentConfiguration->WasLoaded )
-	{
-		GameStack->Push( (Stage*)CurrentConfiguration );
-	} else {
-		Resume();
-	}
-	*/
+	SkinBase = al_load_bitmap( "resource/skins.png" );
+	SkinHair = al_load_bitmap( "resource/skins_hair.png" );
+	SkinTeam = al_load_bitmap( "resource/skins_team.png" );
+	SkinSkin = al_load_bitmap( "resource/skins_skin.png" );
+
 	GameStack->Pop();
 	GameStack->Push( (Stage*)new Menu() );
 }

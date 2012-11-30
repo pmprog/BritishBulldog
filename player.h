@@ -9,12 +9,20 @@ class Player
 		Player();
 
 		ALLEGRO_JOYSTICK* Joystick;
-		ALLEGRO_BITMAP* Skin;
 		int Score;
 		Vector* Position;
-		int Skin;
 
-		void SetHairColour(int Hue, int Lum);
-		void SetSkinColour(int Hue, int Lum);
-		void SetShirtColour(int Hue, int Lum);
+		int State;
+		int Frame;
+		bool FacingLeft;
+
+		int Gender;
+		float HairHue;
+		float HairLum;
+		float SkinHue;
+		float SkinLum;
+		float TeamHue;
+		float TeamLum;
+
+		void Player::Render( int DrawX, int DrawY, int DrawW, int DrawH );
 };
