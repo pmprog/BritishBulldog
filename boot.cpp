@@ -1,16 +1,20 @@
 
 #include "boot.h"
-#include "Config/configure.h"
+#include "configure.h"
 #include "menu.h"
 
 void BootUp::Begin()
 {
+	/*
 	if( !CurrentConfiguration->WasLoaded )
 	{
 		GameStack->Push( (Stage*)CurrentConfiguration );
 	} else {
 		Resume();
 	}
+	*/
+	GameStack->Pop();
+	GameStack->Push( (Stage*)new Menu() );
 }
 
 void BootUp::Pause()
@@ -19,8 +23,7 @@ void BootUp::Pause()
 
 void BootUp::Resume()
 {
-	GameStack->Pop();
-	GameStack->Push( (Stage*)new Menu() );
+
 }
 
 void BootUp::Finish()

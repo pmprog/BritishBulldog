@@ -2,7 +2,7 @@
 #pragma once
 
 #define _config
-#include "../main.h"
+#include "main.h"
 
 class Configuration : Stage
 {

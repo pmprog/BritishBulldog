@@ -177,11 +177,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Config\configure.cpp"
+				RelativePath=".\configure.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\game.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\maths\line.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\maths\list.cpp"
 				>
 			</File>
 			<File
@@ -193,7 +201,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\player.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stagestack.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\maths\vector2.cpp"
 				>
 			</File>
 		</Filter>
@@ -207,7 +223,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Config\configure.h"
+				RelativePath=".\configure.h"
 				>
 			</File>
 			<File
@@ -219,6 +235,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\maths\line.h"
+				>
+			</File>
+			<File
+				RelativePath=".\maths\list.h"
+				>
+			</File>
+			<File
 				RelativePath=".\main.h"
 				>
 			</File>
@@ -227,11 +251,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\player.h"
+				>
+			</File>
+			<File
 				RelativePath=".\stage.h"
 				>
 			</File>
 			<File
 				RelativePath=".\stagestack.h"
+				>
+			</File>
+			<File
+				RelativePath=".\maths\vector2.h"
 				>
 			</File>
 		</Filter>

@@ -1,18 +1,21 @@
 #define _core
 #include "main.h"
 #include "boot.h"
-#include "Config/configure.h"
+#include "configure.h"
 
 int main( int argc, char* argv[] )
 {
 	ALLEGRO_EVENT e;
+	ALLEGRO_TIMER* t;
+	int64_t framesToUpdate = 0;
+
 	if( !al_init() )
 	{
 		return -1;
 	}
 	
 	al_init_font_addon();
-	if( !al_install_keyboard() || !al_install_joystick() || !al_init_primitives_addon() || !al_init_ttf_addon() )
+	if( !al_install_keyboard() || !al_install_joystick() || !al_init_primitives_addon() || !al_init_ttf_addon() || !al_init_image_addon() )
 	{
 		return -1;
 	}
@@ -25,7 +28,7 @@ int main( int argc, char* argv[] )
 
 	bool foundMode = false;
 	int fallbackW = 800;
-	int fallbackH = 600;
+	int fallbackH = 480;
 	for( int modeIdx = 0; modeIdx < al_get_num_display_modes(); modeIdx++ )
 	{
 		if( al_get_display_mode( modeIdx, &ScreenMode ) != NULL )
@@ -50,10 +53,21 @@ int main( int argc, char* argv[] )
 	} else {
 		Screen = al_create_display( fallbackW, fallbackH );
 	}
-	
+
+	t = al_create_timer( 1.0 / SCREEN_FPS );
+  if( t == NULL )
+    Quit = true;
+  al_start_timer( t );
+
+
 	EventQueue = al_create_event_queue();
 	al_register_event_source( EventQueue, al_get_display_event_source( Screen ) );
 	al_register_event_source( EventQueue, al_get_keyboard_event_source() );
+	al_register_event_source( EventQueue, al_get_timer_event_source( t ) );
+
+	al_set_blender( ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA );
+
+	PlayerList = new List();
 
 	GameStack->Push( (Stage*)new BootUp() );
 
@@ -74,12 +88,20 @@ int main( int argc, char* argv[] )
 					case ALLEGRO_EVENT_JOYSTICK_CONFIGURATION:
 						al_reconfigure_joysticks();
 						break;
+					case ALLEGRO_EVENT_TIMER:
+						framesToUpdate++;
+						break;
 					default:
 						GameStack->Current()->Event( &e );
 						break;
 				}
 			}
-			al_clear_to_color( al_map_rgb( 0, 0, 0 ) );
+
+			for( int frmUp = 0; frmUp < framesToUpdate; frmUp++ )
+			{
+				GameStack->Current()->Update();
+			}
+
 			GameStack->Current()->Render();
 			al_flip_display();
 		}
