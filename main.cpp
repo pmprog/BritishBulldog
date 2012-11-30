@@ -97,9 +97,13 @@ int main( int argc, char* argv[] )
 				}
 			}
 
-			for( int frmUp = 0; frmUp < framesToUpdate; frmUp++ )
+			if( framesToUpdate > 0 )
 			{
-				GameStack->Current()->Update();
+				for( int frmUp = 0; frmUp < framesToUpdate; frmUp++ )
+				{
+					GameStack->Current()->Update();
+				}
+				framesToUpdate = 0;
 			}
 
 			GameStack->Current()->Render();
