@@ -1,6 +1,7 @@
 
 #include "menu.h"
 #include "configure.h"
+#include "game.h"
 #include "player.h"
 
 void Menu::Begin()
@@ -13,16 +14,16 @@ void Menu::Begin()
 	buttonState = 0;
 	buttonStateDelay = 0;
 
+	gameCountDown = 10;
+	gameCountDownDelay = 0;
+	gameCountDownActive = false;
+
 	titleFont = al_load_font( "resource/forte.ttf", 128, 0 );
 	menuFont = al_load_font( "resource/forte.ttf", 32, 0 );
 	titleBkg = al_load_bitmap( "resource/title.png" );
 	buttonUp = al_load_bitmap( "resource/button_up.png" );
 	buttonDown = al_load_bitmap( "resource/button_down.png" );
 
-
-	// Debug!!
-	Player* p = new Player();
-	PlayerList->AddToEnd((void*)p);
 
 }
 
@@ -45,11 +46,42 @@ void Menu::Finish()
 
 void Menu::Event(ALLEGRO_EVENT *e)
 {
+	Player* p;
+	bool found = false;
+
 	switch( e->type )
 	{
 		case ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN:
+			for( int i = 0; i < PlayerList->count; i++ )
+			{
+				p = (Player*)PlayerList->ItemAt(i);
+				if( p->Joystick == e->joystick.id )
+				{
+					if( p->State < STATE_READY )
+						p->State++;
+					found = true;
+					break;
+				}
+			}
+
+			if( !found )
+			{
+				p = new Player();
+				p->Joystick = e->joystick.id;
+				PlayerList->AddToEnd( p );
+			}
 			break;
 		case ALLEGRO_EVENT_JOYSTICK_AXIS:
+			for( int i = 0; i < PlayerList->count; i++ )
+			{
+				p = (Player*)PlayerList->ItemAt(i);
+				if( p->Joystick == e->joystick.id )
+				{
+					p->MenuProcessInput( e->joystick.pos );
+
+					break;
+				}
+			}
 			break;
 	}
 }
@@ -71,6 +103,33 @@ void Menu::Update()
 	buttonStateDelay = (++buttonStateDelay) % 6;
 	if( buttonStateDelay == 0 )
 		buttonState = 1 - buttonState;
+
+
+	if( PlayerList->count > 0 )
+	{
+		int ready = 0;
+		for( int idx = 0; idx < PlayerList->count; idx++ )
+		{
+			if( ((Player*)PlayerList->ItemAt(idx))->State == STATE_READY )
+				ready++;
+		}
+
+		if( PlayerList->count == ready )
+		{
+			gameCountDownActive = true;
+			gameCountDownDelay = (++gameCountDownDelay) % SCREEN_FPS;
+			if( gameCountDownDelay == 0 )
+				gameCountDown--;
+			if( gameCountDown == 0 )
+			{
+				GameStack->Push( (Stage*)new Game() );
+			}
+		} else {
+			// Wait for players to select character data
+			gameCountDownActive = false;
+			gameCountDown = 10;
+		}
+	}
 }
 
 void Menu::Render()
@@ -98,6 +157,12 @@ void Menu::Render()
 	al_draw_text( menuFont, al_map_rgb( 0, 0, 0 ), CurrentConfiguration->ScreenWidth, CurrentConfiguration->ScreenHeight - 48, ALLEGRO_ALIGN_RIGHT, numJoy );
 
 
+	if( gameCountDownActive )
+	{
+		sprintf( numJoy, "Game Starts In %d Seconds", gameCountDown );
+		al_draw_text( titleFont, al_map_rgb( 0, 0, 0 ), (CurrentConfiguration->ScreenWidth / 2) + 2, (CurrentConfiguration->ScreenHeight / 2) + 2, ALLEGRO_ALIGN_CENTRE, numJoy );
+		al_draw_text( titleFont, al_map_rgb( 255, 255, 128 ), CurrentConfiguration->ScreenWidth / 2, CurrentConfiguration->ScreenHeight / 2, ALLEGRO_ALIGN_CENTRE, numJoy );
+	}
 }
 
 void Menu::RenderPlayerBox( int PlayerIdx, int BoxX, int BoxY, int BoxW, int BoxH )
@@ -110,8 +175,34 @@ void Menu::RenderPlayerBox( int PlayerIdx, int BoxX, int BoxY, int BoxW, int Box
 	{
 		al_draw_bitmap( (buttonState == 0 ? buttonUp : buttonDown), BoxX + (BoxW / 2) - (al_get_bitmap_width(buttonDown) / 2), BoxY + (BoxH / 2) - (al_get_bitmap_height(buttonDown) / 2), 0 );
 	} else {
-		int ScaleSize = ((BoxW <= BoxH ? BoxW : BoxH) / 5) * 4;
-		((Player*)PlayerList->ItemAt( PlayerIdx ))->Render( BoxX + (BoxW / 2), BoxY + (BoxH / 2) + (ScaleSize / 2), ScaleSize, ScaleSize );
+		Player* p = (Player*)PlayerList->ItemAt( PlayerIdx );
+		if( p->State == STATE_AWAIT_ENTRY )
+		{
+			al_draw_bitmap( (buttonState == 0 ? buttonUp : buttonDown), BoxX + (BoxW / 2) - (al_get_bitmap_width(buttonDown) / 2), BoxY + (BoxH / 2) - (al_get_bitmap_height(buttonDown) / 2), 0 );
+		} else {
+			int ScaleSize = ((BoxW <= BoxH ? BoxW : BoxH) / 5) * 4;
+			p->Render( BoxX + (BoxW / 2), BoxY + (BoxH / 2) + (ScaleSize / 2), ScaleSize, ScaleSize );
+
+			switch( p->State )
+			{
+				case STATE_SELECT_GENDER:
+					al_draw_text( menuFont, al_map_rgb( 255, 255, 255 ), BoxX + (BoxW / 2), BoxY + BoxH - al_get_font_line_height( menuFont ), ALLEGRO_ALIGN_CENTRE, "< Gender >" );
+					break;
+				case STATE_SELECT_SKIN:
+					al_draw_text( menuFont, al_map_rgb( 255, 255, 255 ), BoxX + (BoxW / 2), BoxY + BoxH - al_get_font_line_height( menuFont ), ALLEGRO_ALIGN_CENTRE, "< Skin >" );
+					break;
+				case STATE_SELECT_HAIR:
+					al_draw_text( menuFont, al_map_rgb( 255, 255, 255 ), BoxX + (BoxW / 2), BoxY + BoxH - al_get_font_line_height( menuFont ), ALLEGRO_ALIGN_CENTRE, "< Hair >" );
+					break;
+				case STATE_SELECT_TEAM:
+					al_draw_text( menuFont, al_map_rgb( 255, 255, 255 ), BoxX + (BoxW / 2), BoxY + BoxH - al_get_font_line_height( menuFont ), ALLEGRO_ALIGN_CENTRE, "< Colour >" );
+					break;
+				case STATE_READY:
+					al_draw_text( menuFont, al_map_rgb( 255, 255, 255 ), BoxX + (BoxW / 2), BoxY + BoxH - al_get_font_line_height( menuFont ), ALLEGRO_ALIGN_CENTRE, "Ready" );
+					break;
+			}
+
+		}
 	}
 
 }

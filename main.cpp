@@ -63,6 +63,7 @@ int main( int argc, char* argv[] )
 	EventQueue = al_create_event_queue();
 	al_register_event_source( EventQueue, al_get_display_event_source( Screen ) );
 	al_register_event_source( EventQueue, al_get_keyboard_event_source() );
+	al_register_event_source( EventQueue, al_get_joystick_event_source() );
 	al_register_event_source( EventQueue, al_get_timer_event_source( t ) );
 
 	al_set_blender( ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA );

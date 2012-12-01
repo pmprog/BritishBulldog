@@ -17,6 +17,9 @@ class Menu : Stage
 		int playerTint;
 		int buttonState;
 		int buttonStateDelay;
+		int gameCountDown;
+		int gameCountDownDelay;
+		bool gameCountDownActive;
 
 		void RenderPlayerBox( int PlayerIdx, int BoxX, int BoxY, int BoxW, int BoxH );
 
