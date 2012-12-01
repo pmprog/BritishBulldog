@@ -10,6 +10,10 @@ struct PlayerInformation
 
 class Game : Stage
 {
+	private:
+		ALLEGRO_BITMAP* bkgSky;
+		ALLEGRO_BITMAP* bkgGrnd;
+
   public:
 		PlayerInformation	Players[MAX_PLAYERS];
 

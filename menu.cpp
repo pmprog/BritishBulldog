@@ -32,23 +32,31 @@ void Menu::Begin()
 			p->State = STATE_AWAIT_ENTRY;
 		}
 	}
+
+	//menuMusic = al_load_audio_stream( "resource/wandschrank-gurkenbalken.mp3" );
+	//al_register_event_source( EventQueue, al_get_audio_stream_event_source(menuMusic) );
+	//al_set_audio_stream_playing( menuMusic, true );
 }
 
 void Menu::Pause()
 {
+	//al_set_audio_stream_playing( menuMusic, false );
 }
 
 void Menu::Resume()
 {
+	//al_set_audio_stream_playing( menuMusic, true );
 }
 
 void Menu::Finish()
 {
+	//al_set_audio_stream_playing( menuMusic, false );
 	al_destroy_font( menuFont );
 	al_destroy_font( titleFont );
 	al_destroy_bitmap( buttonDown );
 	al_destroy_bitmap( buttonUp );
 	al_destroy_bitmap( titleBkg );
+	//al_destroy_audio_stream( menuMusic );
 }
 
 void Menu::Event(ALLEGRO_EVENT *e)
@@ -90,6 +98,10 @@ void Menu::Event(ALLEGRO_EVENT *e)
 					break;
 				}
 			}
+			break;
+		case ALLEGRO_EVENT_AUDIO_STREAM_FINISHED:
+			al_rewind_audio_stream( menuMusic );
+			al_set_audio_stream_playing( menuMusic, true );
 			break;
 	}
 }

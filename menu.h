@@ -11,6 +11,8 @@ class Menu : Stage
 		ALLEGRO_BITMAP* buttonDown;
 		ALLEGRO_FONT* titleFont;
 		ALLEGRO_FONT* menuFont;
+		ALLEGRO_AUDIO_STREAM* menuMusic;
+
 		int titleTint;
 		int titleTintDelay;
 		int titleTextY;

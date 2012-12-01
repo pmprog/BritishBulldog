@@ -8,6 +8,8 @@
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_color.h>
 #include <allegro5/allegro_image.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #include "stagestack.h"
 #include "maths/vector2.h"
 #include "maths/list.h"
