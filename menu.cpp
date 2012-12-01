@@ -24,7 +24,14 @@ void Menu::Begin()
 	buttonUp = al_load_bitmap( "resource/button_up.png" );
 	buttonDown = al_load_bitmap( "resource/button_down.png" );
 
-
+	if( PlayerList->count > 0 )
+	{
+		for( int idx = 0; idx < PlayerList->count; idx++ )
+		{
+			Player* p = (Player*)PlayerList->ItemAt(idx);
+			p->State = STATE_AWAIT_ENTRY;
+		}
+	}
 }
 
 void Menu::Pause()
@@ -59,6 +66,7 @@ void Menu::Event(ALLEGRO_EVENT *e)
 				{
 					if( p->State < STATE_READY )
 						p->State++;
+					p->ProcessInput( e );
 					found = true;
 					break;
 				}
@@ -71,14 +79,14 @@ void Menu::Event(ALLEGRO_EVENT *e)
 				PlayerList->AddToEnd( p );
 			}
 			break;
+		case ALLEGRO_EVENT_JOYSTICK_BUTTON_UP:
 		case ALLEGRO_EVENT_JOYSTICK_AXIS:
 			for( int i = 0; i < PlayerList->count; i++ )
 			{
 				p = (Player*)PlayerList->ItemAt(i);
 				if( p->Joystick == e->joystick.id )
 				{
-					p->MenuProcessInput( e->joystick.pos );
-
+					p->ProcessInput( e );
 					break;
 				}
 			}
@@ -110,8 +118,78 @@ void Menu::Update()
 		int ready = 0;
 		for( int idx = 0; idx < PlayerList->count; idx++ )
 		{
-			if( ((Player*)PlayerList->ItemAt(idx))->State == STATE_READY )
+			Player* p = (Player*)PlayerList->ItemAt(idx);
+			if( p->State == STATE_READY )
+			{
 				ready++;
+			} else {
+
+				switch( p->State )
+				{
+					case STATE_SELECT_GENDER:
+						if( p->DidInputChange(INPUT_LEFT, true) || p->DidInputChange(INPUT_RIGHT, true) )
+							p->Gender = 1 - p->Gender;
+						break;
+					case STATE_SELECT_HAIR:
+						if( (p->UserInput & INPUT_LEFT) != 0 )
+						{
+							p->HairHue += 1.0;
+							if( p->HairHue >= 360.0 )
+								p->HairHue -= 360.0;
+						}
+						if( (p->UserInput & INPUT_RIGHT) != 0 )
+						{
+							p->HairHue -= 1.0;
+							if( p->HairHue < 0.0 )
+								p->HairHue += 360.0;
+						}
+						if( (p->UserInput & INPUT_UP) != 0 && p->HairLum < 1.0 )
+						{
+							p->HairLum += 0.01;
+							if( p->HairLum > 1.0 )
+								p->HairLum = 1.0;
+						}
+						if( (p->UserInput & INPUT_DOWN) != 0 && p->HairLum > 0.0 )
+						{
+							p->HairLum -= 0.01;
+							if( p->HairLum < 0.0 )
+								p->HairLum = 0.0;
+						}
+						break;
+					case STATE_SELECT_SKIN:
+						if( p->DidInputChange(INPUT_LEFT, true) || p->DidInputChange(INPUT_RIGHT, true) )
+							p->SkinLum = 1.0 - p->SkinLum;
+						break;
+					case STATE_SELECT_TEAM:
+						if( (p->UserInput & INPUT_LEFT) != 0 )
+						{
+							p->TeamHue += 2.0;
+							if( p->TeamHue >= 360.0 )
+								p->TeamHue -= 360.0;
+						}
+						if( (p->UserInput & INPUT_RIGHT) != 0 )
+						{
+							p->TeamHue -= 2.0;
+							if( p->TeamHue < 0.0 )
+								p->TeamHue += 360.0;
+						}
+						if( (p->UserInput & INPUT_UP) != 0 && p->TeamLum < 1.0 )
+						{
+							p->TeamLum += 0.01;
+							if( p->TeamLum > 1.0 )
+								p->TeamLum = 1.0;
+						}
+						if( (p->UserInput & INPUT_DOWN) != 0 && p->TeamLum > 0.0 )
+						{
+							p->TeamLum -= 0.01;
+							if( p->TeamLum < 0.0 )
+								p->TeamLum = 0.0;
+						}
+
+						break;
+				}
+			}
+			p->Update();
 		}
 
 		if( PlayerList->count == ready )
@@ -163,6 +241,18 @@ void Menu::Render()
 		al_draw_text( titleFont, al_map_rgb( 0, 0, 0 ), (CurrentConfiguration->ScreenWidth / 2) + 2, (CurrentConfiguration->ScreenHeight / 2) + 2, ALLEGRO_ALIGN_CENTRE, numJoy );
 		al_draw_text( titleFont, al_map_rgb( 255, 255, 128 ), CurrentConfiguration->ScreenWidth / 2, CurrentConfiguration->ScreenHeight / 2, ALLEGRO_ALIGN_CENTRE, numJoy );
 	}
+
+#ifdef _DEBUG
+	for( int idx = 0; idx < al_get_num_joysticks(); idx++ )
+	{
+		ALLEGRO_JOYSTICK* j = al_get_joystick( idx );
+		ALLEGRO_JOYSTICK_STATE je;
+		al_get_joystick_state( j, &je );
+		sprintf( numJoy, "%d: %f : %d: %f", 0, je.stick[0].axis[0], 1, je.stick[0].axis[1] );
+		al_draw_text( menuFont, al_map_rgb( 0, 255, 255 ), 400, idx * 40, ALLEGRO_ALIGN_LEFT, numJoy );
+	}
+#endif
+
 }
 
 void Menu::RenderPlayerBox( int PlayerIdx, int BoxX, int BoxY, int BoxW, int BoxH )

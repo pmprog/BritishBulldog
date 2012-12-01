@@ -14,9 +14,11 @@ Player::Player()
 	HairHue = rand() % 360;
 	HairLum = (rand() % 2 ? 0.9 : 0.2);
 	SkinHue = 10.0;
-	SkinLum = (rand() % 2 ? 0.9 : 0.2);
+	SkinLum = (rand() % 2 ? 0.8 : 0.2);
 	TeamHue = rand() % 360;
 	TeamLum = 0.5;
+
+	UserInput = INPUT_NONE;
 }
 
 int Player::GetFrameNumber()
@@ -50,30 +52,51 @@ void Player::Render( int DrawX, int DrawY, int DrawW, int DrawH )
 	al_destroy_bitmap( sub );
 }
 
-void Player::MenuProcessInput( float Direction )
+void Player::ProcessInput( ALLEGRO_EVENT *e )
 {
-	switch( State )
+
+	switch( e->type )
 	{
-		case STATE_SELECT_GENDER:
-			Gender = 1 - Gender;
+		case ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN:
+			UserInput |= INPUT_BUTTON;
 			break;
-		case STATE_SELECT_HAIR:
-			HairHue += Direction;
-			if( HairHue >= 360.0 )
-				HairHue -= 360.0;
-			if( HairHue < 0.0 )
-				HairHue += 360.0;
+		case ALLEGRO_EVENT_JOYSTICK_BUTTON_UP:
+			UserInput &= ~INPUT_BUTTON;
 			break;
-		case STATE_SELECT_SKIN:
-			SkinLum = 1.1 - SkinLum;
-			break;
-		case STATE_SELECT_TEAM:
-			TeamHue += Direction;
-			if( TeamHue >= 360.0 )
-				TeamHue -= 360.0;
-			if( TeamHue < 0.0 )
-				TeamHue += 360.0;
+		case ALLEGRO_EVENT_JOYSTICK_AXIS:
+			if( (e->joystick.axis % 2) == 0 )
+			{
+				UserInput &= ~(INPUT_LEFT | INPUT_RIGHT);
+				if( e->joystick.pos < 0 )
+				{
+					UserInput |= INPUT_LEFT;
+				} else if( e->joystick.pos > 0 ) {
+					UserInput |= INPUT_RIGHT;
+				}
+			} else {
+				UserInput &= ~(INPUT_UP | INPUT_DOWN);
+				if( e->joystick.pos < 0 )
+				{
+					UserInput |= INPUT_UP;
+				} else if( e->joystick.pos > 0 ) {
+					UserInput |= INPUT_DOWN;
+				}
+			}
 			break;
 	}
 
+
+}
+
+void Player::Update()
+{
+	UserInputPrevious = UserInput;
+}
+
+bool Player::DidInputChange( int InputFlag, bool Pressed )
+{
+	int c = (UserInput & InputFlag);
+	int p = (UserInputPrevious & InputFlag);
+
+	return ( Pressed && c != 0 && p == 0 ) || ( !Pressed && c == 0 && p != 0 );
 }

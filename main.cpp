@@ -20,6 +20,9 @@ int main( int argc, char* argv[] )
 		return -1;
 	}
 
+	// Random number is guarenteed to be random
+	srand( 5 );
+
 	GameStack = new StageStack();
 	CurrentConfiguration = new Configuration();
 

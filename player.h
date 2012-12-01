@@ -14,6 +14,13 @@
 #define STATE_RUNNING					7
 #define STATE_KNACKERED				8
 
+#define INPUT_NONE						0
+#define INPUT_LEFT						1
+#define INPUT_UP							2
+#define INPUT_RIGHT						4
+#define INPUT_DOWN						8
+#define INPUT_BUTTON					16
+
 class Player
 {
 	public:
@@ -28,6 +35,9 @@ class Player
 		bool FacingLeft;
 		bool IsBulldog;
 
+		int UserInputPrevious;
+		int UserInput;
+
 		int Gender;
 		float HairHue;
 		float HairLum;
@@ -37,6 +47,9 @@ class Player
 		float TeamLum;
 
 		int GetFrameNumber();
-		void MenuProcessInput( float Direction );
+		void ProcessInput( ALLEGRO_EVENT *e );
 		void Render( int DrawX, int DrawY, int DrawW, int DrawH );
+		void Update();
+
+		bool DidInputChange( int InputFlag, bool Pressed );
 };

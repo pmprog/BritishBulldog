@@ -19,7 +19,11 @@ void Configuration::InitSettings()
 	{
 		ScreenWidth = curMon.x2 - curMon.x1;
 		ScreenHeight = curMon.y2 - curMon.y1;
-		FullScreen = false; // true;
+#ifdef _DEBUG
+		FullScreen = false;
+#else
+		FullScreen = true;
+#endif
 	} else {
 		ScreenWidth = 1024;
 		ScreenHeight = 600;
