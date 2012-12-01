@@ -18,8 +18,8 @@ void Menu::Begin()
 	gameCountDownDelay = 0;
 	gameCountDownActive = false;
 
-	titleFont = al_load_font( "resource/forte.ttf", 128, 0 );
-	menuFont = al_load_font( "resource/forte.ttf", 32, 0 );
+	titleFont = al_load_font( "resource/forte.ttf", CurrentConfiguration->ScreenHeight / 8, 0 );
+	menuFont = al_load_font( "resource/forte.ttf", CurrentConfiguration->ScreenHeight / 48, 0 );
 	titleBkg = al_load_bitmap( "resource/title.png" );
 	buttonUp = al_load_bitmap( "resource/button_up.png" );
 	buttonDown = al_load_bitmap( "resource/button_down.png" );
@@ -215,7 +215,7 @@ void Menu::Render()
 	int plyBoxW = ((CurrentConfiguration->ScreenWidth - 40) / 4) - 10;
 	int plyBoxH = CurrentConfiguration->ScreenHeight / 4;
 
-	al_clear_to_color( al_map_rgb( 0, 0, 0 ) );
+	//al_clear_to_color( al_map_rgb( 0, 0, 0 ) );
 
 	al_draw_tinted_scaled_bitmap( titleBkg, al_map_rgb( titleTint, titleTint, titleTint ), 0, 0, al_get_bitmap_width(titleBkg), al_get_bitmap_height(titleBkg), 0, 0, CurrentConfiguration->ScreenWidth, CurrentConfiguration->ScreenHeight, 0 );
 
@@ -237,7 +237,7 @@ void Menu::Render()
 
 	if( gameCountDownActive )
 	{
-		sprintf( numJoy, "Game Starts In %d Seconds", gameCountDown );
+		sprintf( numJoy, "Starts In %d", gameCountDown );
 		al_draw_text( titleFont, al_map_rgb( 0, 0, 0 ), (CurrentConfiguration->ScreenWidth / 2) + 2, (CurrentConfiguration->ScreenHeight / 2) + 2, ALLEGRO_ALIGN_CENTRE, numJoy );
 		al_draw_text( titleFont, al_map_rgb( 255, 255, 128 ), CurrentConfiguration->ScreenWidth / 2, CurrentConfiguration->ScreenHeight / 2, ALLEGRO_ALIGN_CENTRE, numJoy );
 	}
