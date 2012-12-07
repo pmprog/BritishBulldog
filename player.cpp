@@ -1,14 +1,18 @@
 
 #include "player.h"
+#include "configure.h"
 
 Player::Player()
 {
 	Position = new Vector(0, 0);
 
+	Energy = ENERGY_MAX;
+
 	State = STATE_SELECT_GENDER;
 	Frame = 0;
 	FacingLeft = false;
 	IsBulldog = false;
+	IsAI = false;
 
 	Gender = rand() % 2;
 	HairHue = rand() % 360;
@@ -23,12 +27,21 @@ Player::Player()
 
 int Player::GetFrameNumber()
 {
-	if( State == STATE_WALKING || State == STATE_RUNNING )
+	switch( State )
 	{
-		return 1 + (Frame % 4);
-	} else {
-		return 0;
+		case STATE_WALKING:
+			return 1 + (Frame % 4);
+			break;
+		case STATE_KNACKERED:
+			return 5 + (Frame % 2);
+		default:
+			return 0;
 	}
+}
+
+void Player::Render( int DrawW, int DrawH )
+{
+	Render( Position->x, Position->y, DrawW, DrawH );
 }
 
 void Player::Render( int DrawX, int DrawY, int DrawW, int DrawH )
@@ -91,6 +104,90 @@ void Player::ProcessInput( ALLEGRO_EVENT *e )
 void Player::Update()
 {
 	UserInputPrevious = UserInput;
+
+	bool turbo = UserInput & INPUT_BUTTON;
+	float distanceMod = (turbo ? ((float)CurrentConfiguration->ScreenWidth / ((float)SCREEN_FPS * 3.7)) : ((float)CurrentConfiguration->ScreenWidth / ((float)SCREEN_FPS * 5.3)));
+	int dir = UserInput & ~INPUT_BUTTON;
+	float xMod = 0.0;
+	float yMod = 0.0;
+	switch( dir )
+	{
+		case INPUT_LEFT:
+			xMod = -2.0;
+			break;
+		case INPUT_RIGHT:
+			xMod = 2.0;
+			break;
+		case INPUT_UP:
+			yMod = -2.0;
+			break;
+		case INPUT_DOWN:
+			yMod = 2.0;
+			break;
+		case INPUT_LEFT | INPUT_UP:
+			xMod = -1.414;
+			yMod = -1.414;
+			break;
+		case INPUT_RIGHT | INPUT_UP:
+			xMod = 1.414;
+			yMod = -1.414;
+			break;
+		case INPUT_LEFT | INPUT_DOWN:
+			xMod = -1.414;
+			yMod = 1.414;
+			break;
+		case INPUT_RIGHT | INPUT_DOWN:
+			xMod = 1.414;
+			yMod = 1.414;
+			break;
+	}
+	xMod *= distanceMod;
+	if( xMod < 0.0 )
+		FacingLeft = true;
+	if( xMod > 0.0 )
+		FacingLeft = false;
+	yMod *= distanceMod;
+	switch( State )
+	{
+		case STATE_KNACKERED:
+			Energy += ENERGY_RECOVER;
+			if( Energy >= ENERGY_MAX / 3.0 )
+			{
+				if( xMod != 0.0 || yMod != 0.0 )
+					State = STATE_WALKING;
+				else
+					State = STATE_STANDING;
+			}
+			break;
+
+		case STATE_STANDING:
+			if( xMod != 0.0 || yMod != 0.0 )
+				State = STATE_WALKING;
+			else
+				Energy += ENERGY_RECOVER;
+			break;
+
+		case STATE_WALKING:
+			Frame = ++Frame % 4;
+			if( xMod != 0.0 || yMod != 0.0 )
+			{
+				Energy -= ( turbo ? ENERGY_RUNUSAGE : ENERGY_WALKUSAGE );
+				Position->x += xMod;
+				Position->y += yMod;
+			} else {
+				State = STATE_STANDING;
+				Frame = 0;
+			}
+			break;
+	}
+	if( Energy <= 0.0 )
+	{
+		Energy = 0.0;
+		State = STATE_KNACKERED;
+		Frame = 0;
+	} else if ( Energy > ENERGY_MAX ) {
+		Energy = ENERGY_MAX;
+	}
 }
 
 bool Player::DidInputChange( int InputFlag, bool Pressed )

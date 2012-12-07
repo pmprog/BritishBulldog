@@ -27,13 +27,15 @@ class Player
 		Player();
 
 		ALLEGRO_JOYSTICK* Joystick;
-		int Score;
+		float Energy;
 		Vector* Position;
 
 		int State;
 		int Frame;
 		bool FacingLeft;
 		bool IsBulldog;
+		bool IsAI;
+		bool DesintationIsRightSide;
 
 		int UserInputPrevious;
 		int UserInput;
@@ -49,6 +51,7 @@ class Player
 		int GetFrameNumber();
 		void ProcessInput( ALLEGRO_EVENT *e );
 		void Render( int DrawX, int DrawY, int DrawW, int DrawH );
+		void Render( int DrawW, int DrawH );
 		void Update();
 
 		bool DidInputChange( int InputFlag, bool Pressed );
