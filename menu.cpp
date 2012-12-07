@@ -11,10 +11,12 @@ void Menu::Begin()
 	titleTextY = -200;
 	playerTint = 0;
 
+	MinPlayerCount = 6;
+
 	buttonState = 0;
 	buttonStateDelay = 0;
 
-	gameCountDown = 10;
+	gameCountDown = START_GAME_COUNTDOWN;
 	gameCountDownDelay = 0;
 	gameCountDownActive = false;
 
@@ -33,30 +35,32 @@ void Menu::Begin()
 		}
 	}
 
-	//menuMusic = al_load_audio_stream( "resource/wandschrank-gurkenbalken.mp3" );
-	//al_register_event_source( EventQueue, al_get_audio_stream_event_source(menuMusic) );
-	//al_set_audio_stream_playing( menuMusic, true );
+	menuMusic = al_load_audio_stream( "resource/wandschrank-gurkenbalken.ogg", 4, 2048 );
+	al_set_audio_stream_playmode( menuMusic, ALLEGRO_PLAYMODE_LOOP );
+	al_attach_audio_stream_to_mixer( menuMusic, mixer );
+	al_set_audio_stream_playing( menuMusic, true );
 }
 
 void Menu::Pause()
 {
-	//al_set_audio_stream_playing( menuMusic, false );
+	al_set_audio_stream_playing( menuMusic, false );
 }
 
 void Menu::Resume()
 {
-	//al_set_audio_stream_playing( menuMusic, true );
+	al_set_audio_stream_playing( menuMusic, true );
 }
 
 void Menu::Finish()
 {
-	//al_set_audio_stream_playing( menuMusic, false );
+	
 	al_destroy_font( menuFont );
 	al_destroy_font( titleFont );
 	al_destroy_bitmap( buttonDown );
 	al_destroy_bitmap( buttonUp );
 	al_destroy_bitmap( titleBkg );
-	//al_destroy_audio_stream( menuMusic );
+	al_set_audio_stream_playing( menuMusic, false );
+	al_destroy_audio_stream( menuMusic );
 }
 
 void Menu::Event(ALLEGRO_EVENT *e)
@@ -66,7 +70,17 @@ void Menu::Event(ALLEGRO_EVENT *e)
 
 	switch( e->type )
 	{
+		case ALLEGRO_EVENT_KEY_DOWN:
+			if( e->keyboard.keycode == ALLEGRO_KEY_LEFT && MinPlayerCount > 0 )
+				MinPlayerCount--;
+			if( e->keyboard.keycode == ALLEGRO_KEY_RIGHT && MinPlayerCount < 32 )
+				MinPlayerCount++;
+			break;
+
 		case ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN:
+			titleTint = 255;
+			playerTint = 128;
+			titleTextY = 20;
 			for( int i = 0; i < PlayerList->count; i++ )
 			{
 				p = (Player*)PlayerList->ItemAt(i);
@@ -100,8 +114,11 @@ void Menu::Event(ALLEGRO_EVENT *e)
 			}
 			break;
 		case ALLEGRO_EVENT_AUDIO_STREAM_FINISHED:
+			/*
+			al_set_audio_stream_playing( menuMusic, false );
 			al_rewind_audio_stream( menuMusic );
 			al_set_audio_stream_playing( menuMusic, true );
+			*/
 			break;
 	}
 }
@@ -212,12 +229,16 @@ void Menu::Update()
 				gameCountDown--;
 			if( gameCountDown == 0 )
 			{
-				GameStack->Push( (Stage*)new Game() );
+				gameCountDownActive = false;
+				gameCountDown = START_GAME_COUNTDOWN;
+				Game* g = new Game();
+				g->fillAIToCount = MinPlayerCount;
+				GameStack->Push( (Stage*)g );
 			}
 		} else {
 			// Wait for players to select character data
 			gameCountDownActive = false;
-			gameCountDown = 10;
+			gameCountDown = START_GAME_COUNTDOWN;
 		}
 	}
 }
@@ -240,9 +261,12 @@ void Menu::Render()
 		RenderPlayerBox( (plyIdx * 2) + 1, 20 + (plyBoxW * plyIdx) + 5, (CurrentConfiguration->ScreenHeight / 3) + plyBoxH + 10, plyBoxW - 10, plyBoxH );
 	}
 
-	
 
 	char numJoy[200];
+	sprintf( numJoy, "AI Fill To %d Players", MinPlayerCount );
+	al_draw_text( menuFont, al_map_rgb( 128, 128, 255 ), CurrentConfiguration->ScreenWidth, 48, ALLEGRO_ALIGN_RIGHT, numJoy );
+
+
 	sprintf( numJoy, "%d Joystick(s) Found", al_get_num_joysticks() );
 	al_draw_text( menuFont, al_map_rgb( 0, 0, 0 ), CurrentConfiguration->ScreenWidth, CurrentConfiguration->ScreenHeight - 48, ALLEGRO_ALIGN_RIGHT, numJoy );
 

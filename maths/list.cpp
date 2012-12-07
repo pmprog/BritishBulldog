@@ -112,3 +112,61 @@ void List::RemoveAt( int index )
 		count--;
 	}
 }
+
+void List::Move( int fromIndex, int toAfterIndex )
+{
+	ListItem* premove = 0;
+	ListItem* postmove = 0;
+	ListItem* moving = 0;
+	ListItem* predest = 0;
+	ListItem* postdest = 0;
+
+	if( fromIndex == toAfterIndex )
+		return;
+
+	int curItemIdx = 0;
+	ListItem* curItem = first;
+	while( curItem != 0 )
+	{
+		if( curItemIdx == fromIndex )
+		{
+			moving = curItem;
+			premove = curItem->previousItem;
+			postmove = curItem->nextItem;
+		}
+		if( curItemIdx == toAfterIndex )
+		{
+			predest = curItem;
+			postdest = curItem->nextItem;
+		}
+		curItem = curItem->nextItem;
+		curItemIdx++;
+	}
+
+	if( premove != 0 )
+		premove->nextItem = postmove;
+	if( postmove != 0 )
+	{
+		postmove->previousItem = premove;
+		if( premove == 0 )
+			first = postmove;
+	}
+
+	if( toAfterIndex == -1 )
+	{
+		moving->previousItem = 0;
+		moving->nextItem = first;
+		first->previousItem = moving;
+		first = moving;
+	} else {
+		moving->previousItem = predest;
+		moving->nextItem = postdest;
+		predest->nextItem = moving;
+		if( postdest != 0 )
+		{
+			postdest->previousItem = moving;
+		} else {
+			last = moving;
+		}
+	}
+}

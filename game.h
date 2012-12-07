@@ -2,11 +2,13 @@
 #pragma once
 
 #include "main.h"
+#include "player.h"
 
 #define GAMESTATE_REQUEST_BULLDOG			0
 #define GAMESTATE_READY								1
-#define GAMESTATE_INGAME							2
-#define GAMESTATE_RESULTS							3
+#define GAMESTATE_PREPROUND						2
+#define GAMESTATE_INGAME							3
+#define GAMESTATE_RESULTS							4
 
 class Game : Stage
 {
@@ -16,9 +18,13 @@ class Game : Stage
 		ALLEGRO_BITMAP* noticeBox;
 		ALLEGRO_BITMAP* buttonUp;
 		ALLEGRO_BITMAP* buttonDown;
+		ALLEGRO_AUDIO_STREAM* gameMusic;
 
 		int State;
 		int GameCountdown;
+		int buttonPop;
+
+		List* Bulldogs;
 
 		ALLEGRO_FONT* readyFont;
 		int readyFontSize;
@@ -28,8 +34,17 @@ class Game : Stage
 		int gameAreaLeft;
 		int gameAreaRight;
 
+		void SortPlayerList();
+		void CheckTags( Player* bulldog );
+
+		bool destinationIsRightSide;
+
+		Player* Winner;
+		int WinnerCountDown;
+		void ProcessAI( Player* player );
+
   public:
-		List* AIList;
+		int fillAIToCount;
 
     // Stage control
     void Begin();

@@ -11,6 +11,7 @@ Player::Player()
 	State = STATE_SELECT_GENDER;
 	Frame = 0;
 	FacingLeft = false;
+	WasTagged = false;
 	IsBulldog = false;
 	IsAI = false;
 
@@ -67,7 +68,6 @@ void Player::Render( int DrawX, int DrawY, int DrawW, int DrawH )
 
 void Player::ProcessInput( ALLEGRO_EVENT *e )
 {
-
 	switch( e->type )
 	{
 		case ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN:
@@ -97,16 +97,19 @@ void Player::ProcessInput( ALLEGRO_EVENT *e )
 			}
 			break;
 	}
-
-
 }
 
 void Player::Update()
 {
+	Update( true );
+}
+
+void Player::Update( bool UseEnergy )
+{
 	UserInputPrevious = UserInput;
 
 	bool turbo = UserInput & INPUT_BUTTON;
-	float distanceMod = (turbo ? ((float)CurrentConfiguration->ScreenWidth / ((float)SCREEN_FPS * 3.7)) : ((float)CurrentConfiguration->ScreenWidth / ((float)SCREEN_FPS * 5.3)));
+	float distanceMod = (turbo ? ((float)CurrentConfiguration->ScreenWidth / ((float)SCREEN_FPS * SPEED_RUN_TIME)) : ((float)CurrentConfiguration->ScreenWidth / ((float)SCREEN_FPS * SPEED_WALK_TIME)));
 	int dir = UserInput & ~INPUT_BUTTON;
 	float xMod = 0.0;
 	float yMod = 0.0;
@@ -150,6 +153,7 @@ void Player::Update()
 	switch( State )
 	{
 		case STATE_KNACKERED:
+			//if( UseEnergy )
 			Energy += ENERGY_RECOVER;
 			if( Energy >= ENERGY_MAX / 3.0 )
 			{
@@ -163,7 +167,7 @@ void Player::Update()
 		case STATE_STANDING:
 			if( xMod != 0.0 || yMod != 0.0 )
 				State = STATE_WALKING;
-			else
+			else if( UseEnergy )
 				Energy += ENERGY_RECOVER;
 			break;
 
@@ -171,7 +175,8 @@ void Player::Update()
 			Frame = ++Frame % 4;
 			if( xMod != 0.0 || yMod != 0.0 )
 			{
-				Energy -= ( turbo ? ENERGY_RUNUSAGE : ENERGY_WALKUSAGE );
+				if( UseEnergy )
+					Energy -= ( turbo ? ENERGY_RUNUSAGE : ENERGY_WALKUSAGE );
 				Position->x += xMod;
 				Position->y += yMod;
 			} else {

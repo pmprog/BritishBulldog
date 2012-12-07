@@ -32,6 +32,7 @@ class List
 		void AddToEnd( void* newItem );
 
 		void* ItemAt( int index );
+		void Move( int fromIndex, int toAfterIndex );
 
 		void RemoveFirst();
 		void RemoveLast();

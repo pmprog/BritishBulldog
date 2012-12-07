@@ -15,10 +15,20 @@ int main( int argc, char* argv[] )
 	}
 	
 	al_init_font_addon();
-	if( !al_install_keyboard() || !al_install_joystick() || !al_init_primitives_addon() || !al_init_ttf_addon() || !al_init_image_addon() || !al_install_audio() || !al_init_acodec_addon() )
+	if( !al_install_keyboard() || !al_install_joystick() || !al_init_primitives_addon() || !al_init_ttf_addon() || !al_init_image_addon() || !al_init_acodec_addon() || !al_install_audio() )
 	{
 		return -1;
 	}
+
+
+   voice = al_create_voice(44100, ALLEGRO_AUDIO_DEPTH_INT16, ALLEGRO_CHANNEL_CONF_2);
+   if (!voice)
+      return 1;
+   mixer = al_create_mixer(44100, ALLEGRO_AUDIO_DEPTH_FLOAT32, ALLEGRO_CHANNEL_CONF_2);
+   if (!mixer)
+      return 1;
+   if (!al_attach_mixer_to_voice(mixer, voice))
+      return 1;
 
 	// Random number is guarenteed to be random
 	srand( 5 );
@@ -96,7 +106,8 @@ int main( int argc, char* argv[] )
 						framesToUpdate++;
 						break;
 					default:
-						GameStack->Current()->Event( &e );
+						if( GameStack->Current() != 0 )
+							GameStack->Current()->Event( &e );
 						break;
 				}
 			}

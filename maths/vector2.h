@@ -9,4 +9,5 @@ class Vector
 
 		Vector(float X, float Y);
 
+		float DistanceBetween( Vector* compare );
 };

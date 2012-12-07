@@ -25,8 +25,8 @@ class Configuration;
 #ifdef _core
 
 ALLEGRO_DISPLAY_MODE	ScreenMode;
-ALLEGRO_DISPLAY				*Screen;
-ALLEGRO_EVENT_QUEUE		*EventQueue;
+ALLEGRO_DISPLAY*			Screen;
+ALLEGRO_EVENT_QUEUE*	EventQueue;
 bool									Quit = false;
 StageStack*						GameStack;
 Configuration*				CurrentConfiguration;
@@ -37,16 +37,22 @@ ALLEGRO_BITMAP*				SkinHair;
 ALLEGRO_BITMAP*				SkinTeam;
 ALLEGRO_BITMAP*				SkinSkin;
 
+ALLEGRO_MIXER*				mixer;
+ALLEGRO_VOICE*				voice;
+
 #else
 
-extern bool							Quit;
-extern StageStack*			GameStack;
-extern Configuration*		CurrentConfiguration;
-extern List*						PlayerList;
-extern ALLEGRO_BITMAP*	SkinBase;
-extern ALLEGRO_BITMAP*	SkinHair;
-extern ALLEGRO_BITMAP*	SkinTeam;
-extern ALLEGRO_BITMAP*	SkinSkin;
+extern ALLEGRO_EVENT_QUEUE*	EventQueue;
+extern bool									Quit;
+extern StageStack*					GameStack;
+extern Configuration*				CurrentConfiguration;
+extern List*								PlayerList;
+extern ALLEGRO_BITMAP*			SkinBase;
+extern ALLEGRO_BITMAP*			SkinHair;
+extern ALLEGRO_BITMAP*			SkinTeam;
+extern ALLEGRO_BITMAP*			SkinSkin;
+extern ALLEGRO_MIXER*				mixer;
+extern ALLEGRO_VOICE*				voice;
 
 #endif
 

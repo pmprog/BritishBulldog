@@ -12,6 +12,7 @@ class Menu : Stage
 		ALLEGRO_FONT* titleFont;
 		ALLEGRO_FONT* menuFont;
 		ALLEGRO_AUDIO_STREAM* menuMusic;
+		//ALLEGRO_EVENT_SOURCE* menuMusicSource;
 
 		int titleTint;
 		int titleTintDelay;
@@ -24,6 +25,8 @@ class Menu : Stage
 		bool gameCountDownActive;
 
 		void RenderPlayerBox( int PlayerIdx, int BoxX, int BoxY, int BoxW, int BoxH );
+
+		int MinPlayerCount;
 
   public:
     // Stage control

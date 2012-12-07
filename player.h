@@ -34,6 +34,7 @@ class Player
 		int Frame;
 		bool FacingLeft;
 		bool IsBulldog;
+		bool WasTagged;
 		bool IsAI;
 		bool DesintationIsRightSide;
 
@@ -53,6 +54,7 @@ class Player
 		void Render( int DrawX, int DrawY, int DrawW, int DrawH );
 		void Render( int DrawW, int DrawH );
 		void Update();
+		void Update( bool UseEnergy );
 
 		bool DidInputChange( int InputFlag, bool Pressed );
 };
