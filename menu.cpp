@@ -35,20 +35,29 @@ void Menu::Begin()
 		}
 	}
 
-	menuMusic = al_load_audio_stream( "resource/wandschrank-gurkenbalken.ogg", 4, 2048 );
-	al_set_audio_stream_playmode( menuMusic, ALLEGRO_PLAYMODE_LOOP );
-	al_attach_audio_stream_to_mixer( menuMusic, mixer );
-	al_set_audio_stream_playing( menuMusic, true );
+	if( voice != 0 )
+	{
+		menuMusic = al_load_audio_stream( "resource/wandschrank-gurkenbalken.ogg", 4, 2048 );
+		al_set_audio_stream_playmode( menuMusic, ALLEGRO_PLAYMODE_LOOP );
+		al_attach_audio_stream_to_mixer( menuMusic, mixer );
+		al_set_audio_stream_playing( menuMusic, true );
+	}
 }
 
 void Menu::Pause()
 {
-	al_set_audio_stream_playing( menuMusic, false );
+	if( voice != 0 )
+	{
+		al_set_audio_stream_playing( menuMusic, false );
+	}
 }
 
 void Menu::Resume()
 {
-	al_set_audio_stream_playing( menuMusic, true );
+	if( voice != 0 )
+	{
+		al_set_audio_stream_playing( menuMusic, true );
+	}
 }
 
 void Menu::Finish()
@@ -59,8 +68,12 @@ void Menu::Finish()
 	al_destroy_bitmap( buttonDown );
 	al_destroy_bitmap( buttonUp );
 	al_destroy_bitmap( titleBkg );
-	al_set_audio_stream_playing( menuMusic, false );
-	al_destroy_audio_stream( menuMusic );
+
+	if( voice != 0 )
+	{
+		al_set_audio_stream_playing( menuMusic, false );
+		al_destroy_audio_stream( menuMusic );
+	}
 }
 
 void Menu::Event(ALLEGRO_EVENT *e)
